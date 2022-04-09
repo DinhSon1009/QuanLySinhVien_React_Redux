@@ -75,13 +75,28 @@ export class ModalSV extends Component {
   };
   UNSAFE_componentWillReceiveProps(nextProps) {
     nextProps.editSinhVien
-      ? this.setState({ values: nextProps.editSinhVien })
+      ? this.setState({
+          ...this.state,
+          values: nextProps.editSinhVien,
+          errors: {
+            id: "",
+            name: "",
+            email: "",
+            phone: "",
+          },
+        })
       : this.setState({
           values: {
             id: "",
             name: "",
             email: "",
             phone: "",
+          },
+          errors: {
+            id: "",
+            name: "",
+            phone: "",
+            email: "",
           },
         });
   }
@@ -152,14 +167,7 @@ export class ModalSV extends Component {
                     type="button"
                     className="close"
                     data-dismiss="modal"
-                    onClick={() => {
-                      this.handleReset();
-                      if (this.props.editSinhVien) {
-                        this.setState({
-                          values: this.props.editSinhVien,
-                        });
-                      }
-                    }}
+                    onClick={() => this.props.resetEditSinhVien()}
                   >
                     ×
                   </button>
@@ -241,6 +249,11 @@ export class ModalSV extends Component {
                       onClick={() => {
                         if (this.state.valid) {
                           this.props.suaSv(this.state.values);
+                        } else {
+                          alert(
+                            "Không có thay đổi hoặc thay đổi không hợp lệ !"
+                          );
+                          this.props.resetEditSinhVien();
                         }
                       }}
                     >
