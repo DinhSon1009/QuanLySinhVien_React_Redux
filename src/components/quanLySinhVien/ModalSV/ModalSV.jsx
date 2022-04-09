@@ -11,23 +11,13 @@ import {
 
 export class ModalSV extends Component {
   state = {
-    values: {
-      id: "",
-      name: "",
-      email: "",
-      phone: "",
-    },
-    errors: {
-      id: "",
-      name: "",
-      email: "",
-      phone: "",
-    },
+    values: null,
+    errors: null,
     valid: false,
   };
   handleInput = (e) => {
     let tagInput = e.target;
-    let { name, value, type, pattern } = tagInput;
+    let { name, value, pattern } = tagInput;
     let errorMessage = "";
     if (value.trim() === "") {
       errorMessage = name + " không được bỏ trống !";
@@ -45,7 +35,11 @@ export class ModalSV extends Component {
     ) {
       const regex = new RegExp(pattern);
       if (!regex.test(value)) {
-        errorMessage = name + " không đúng định dạng !";
+        if (name === "phone") {
+          errorMessage = name + " có độ dài 9-15 số";
+        } else {
+          errorMessage = name + " không đúng định dạng !";
+        }
       }
     }
     if (name === "id") {
@@ -78,26 +72,11 @@ export class ModalSV extends Component {
       ? this.setState({
           ...this.state,
           values: nextProps.editSinhVien,
-          errors: {
-            id: "",
-            name: "",
-            email: "",
-            phone: "",
-          },
+          errors: null,
         })
       : this.setState({
-          values: {
-            id: "",
-            name: "",
-            email: "",
-            phone: "",
-          },
-          errors: {
-            id: "",
-            name: "",
-            phone: "",
-            email: "",
-          },
+          values: null,
+          errors: null,
         });
   }
   checkValid = () => {
@@ -116,18 +95,8 @@ export class ModalSV extends Component {
   handleReset = () => {
     this.setState({
       ...this.state,
-      errors: {
-        name: "",
-        id: "",
-        email: "",
-        phone: "",
-      },
-      values: {
-        name: "",
-        id: "",
-        email: "",
-        phone: "",
-      },
+      errors: null,
+      values: null,
     });
   };
   render() {
@@ -182,13 +151,13 @@ export class ModalSV extends Component {
                       id="id"
                       pattern="^(0|[1-9][0-9]*)$"
                       disabled={this.props.editSinhVien ? true : false}
-                      value={this.state.values.id}
+                      value={this.state.values?.id ? this.state.values.id : ""}
                       onChange={this.handleInput}
                       className="form-control"
                       placeholder="Enter ID"
                       aria-describedby="helpId"
                     />
-                    <div className="text-danger">{this.state.errors.id}</div>
+                    <div className="text-danger">{this.state.errors?.id}</div>
                   </div>
                   <div className="form-group">
                     <label htmlFor="name">Name</label>
@@ -202,9 +171,11 @@ export class ModalSV extends Component {
                       placeholder="Enter name"
                       aria-describedby="helpId"
                       onChange={this.handleInput}
-                      value={this.state.values.name}
+                      value={
+                        this.state.values?.name ? this.state.values.name : ""
+                      }
                     />
-                    <div className="text-danger">{this.state.errors.name}</div>
+                    <div className="text-danger">{this.state.errors?.name}</div>
                   </div>
                   <div className="form-group">
                     <label htmlFor="name">Email</label>
@@ -218,9 +189,13 @@ export class ModalSV extends Component {
                       placeholder="Enter email"
                       aria-describedby="helpId"
                       onChange={this.handleInput}
-                      value={this.state.values.email}
+                      value={
+                        this.state.values?.email ? this.state.values.email : ""
+                      }
                     />
-                    <div className="text-danger">{this.state.errors.email}</div>
+                    <div className="text-danger">
+                      {this.state.errors?.email}
+                    </div>
                   </div>
                   <div className="form-group">
                     <label htmlFor="phone">Phone Number</label>
@@ -229,14 +204,18 @@ export class ModalSV extends Component {
                       type="text"
                       name="phone"
                       id="phone"
-                      pattern="^(0|[1-9][0-9]*)$"
+                      pattern="^([0-9]{9,15})$"
                       className="form-control"
                       placeholder="Enter phone number"
                       aria-describedby="helpId"
                       onChange={this.handleInput}
-                      value={this.state.values.phone}
+                      value={
+                        this.state.values?.phone ? this.state.values.phone : ""
+                      }
                     />
-                    <div className="text-danger">{this.state.errors.phone}</div>
+                    <div className="text-danger">
+                      {this.state.errors?.phone}
+                    </div>
                   </div>
                 </div>
                 {/* Modal footer */}
