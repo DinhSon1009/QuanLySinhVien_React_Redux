@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/QuanLySinhVien_React_Redux/static/css/main.1f9158db.css",
-    "main.js": "/QuanLySinhVien_React_Redux/static/js/main.c003acf6.js",
+    "main.js": "/QuanLySinhVien_React_Redux/static/js/main.674e4e39.js",
     "index.html": "/QuanLySinhVien_React_Redux/index.html",
     "main.1f9158db.css.map": "/QuanLySinhVien_React_Redux/static/css/main.1f9158db.css.map",
-    "main.c003acf6.js.map": "/QuanLySinhVien_React_Redux/static/js/main.c003acf6.js.map"
+    "main.674e4e39.js.map": "/QuanLySinhVien_React_Redux/static/js/main.674e4e39.js.map"
   },
   "entrypoints": [
     "static/css/main.1f9158db.css",
-    "static/js/main.c003acf6.js"
+    "static/js/main.674e4e39.js"
   ]
 }
