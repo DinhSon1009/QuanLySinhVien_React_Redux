@@ -46,7 +46,6 @@ export const quanLySinhVienReducer = (state = initialState, action) => {
       let cloneArr = [...state.dssv];
       let index = cloneArr.findIndex((sv) => sv.id === action.payload.id);
       cloneArr[index] = action.payload;
-      console.log(cloneArr);
       return {
         ...state,
         dssv: [...cloneArr],

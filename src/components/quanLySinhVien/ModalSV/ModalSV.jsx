@@ -11,23 +11,73 @@ import {
 
 export class ModalSV extends Component {
   state = {
-    sinhVien: {
+    values: {
       id: "",
       name: "",
       email: "",
       phone: "",
     },
+    errors: {
+      id: "",
+      name: "",
+      email: "",
+      phone: "",
+    },
+    valid: false,
   };
   handleInput = (e) => {
-    this.setState({
-      sinhVien: { ...this.state.sinhVien, [e.target.name]: e.target.value },
-    });
+    let tagInput = e.target;
+    let { name, value, type, pattern } = tagInput;
+    let errorMessage = "";
+    if (value.trim() === "") {
+      errorMessage = name + " không được bỏ trống !";
+    }
+
+    if (name === "name") {
+      const regex = new RegExp(pattern);
+      if (regex.test(value)) {
+        errorMessage = name + " không đúng định dạng !";
+      }
+    }
+    if (
+      value !== "" &&
+      (name === "phone" || name === "email" || name === "id")
+    ) {
+      const regex = new RegExp(pattern);
+      if (!regex.test(value)) {
+        errorMessage = name + " không đúng định dạng !";
+      }
+    }
+    if (name === "id") {
+      let index = this.props.dssv.findIndex((sv) => sv.id === value);
+      if (value.trim().length >= 7) {
+        errorMessage = name + " ít hơn 8 ký tự";
+      }
+      if (value !== "" && index !== -1) {
+        errorMessage = name + " đã tồn tại !";
+      }
+    }
+
+    let values = { ...this.state.values, [name]: value };
+    let errors = { ...this.state.errors, [name]: errorMessage };
+
+    this.setState(
+      {
+        ...this.state,
+        values: values,
+        errors: errors,
+      },
+      () => {
+        // console.log(this.state);
+        this.checkValid();
+      }
+    );
   };
   UNSAFE_componentWillReceiveProps(nextProps) {
     nextProps.editSinhVien
-      ? this.setState({ sinhVien: nextProps.editSinhVien })
+      ? this.setState({ values: nextProps.editSinhVien })
       : this.setState({
-          sinhVien: {
+          values: {
             id: "",
             name: "",
             email: "",
@@ -35,6 +85,36 @@ export class ModalSV extends Component {
           },
         });
   }
+  checkValid = () => {
+    let valid = true;
+    for (let key in this.state.errors) {
+      if (this.state.errors[key] !== "" || this.state.values[key] === "") {
+        valid = false;
+      }
+    }
+    this.setState({
+      ...this.state,
+      valid: valid,
+    });
+  };
+
+  handleReset = () => {
+    this.setState({
+      ...this.state,
+      errors: {
+        name: "",
+        id: "",
+        email: "",
+        phone: "",
+      },
+      values: {
+        name: "",
+        id: "",
+        email: "",
+        phone: "",
+      },
+    });
+  };
   render() {
     return (
       <div>
@@ -45,12 +125,20 @@ export class ModalSV extends Component {
             data-toggle="modal"
             data-target="#myModal"
             style={{ marginBottom: "2rem" }}
-            onClick={() => this.props.resetEditSinhVien()}
+            onClick={() => {
+              this.handleReset();
+              this.props.resetEditSinhVien();
+            }}
           >
             Thêm sinh viên
           </Button>
           {/* The Modal */}
-          <div className="modal" id="myModal">
+          <div
+            className="modal"
+            id="myModal"
+            data-keyboard="false"
+            data-backdrop="static"
+          >
             <div className="modal-dialog">
               <div className="modal-content">
                 {/* Modal Header */}
@@ -60,7 +148,19 @@ export class ModalSV extends Component {
                       ? "Cập nhật sinh viên"
                       : "Thêm sinh viên"}
                   </h4>
-                  <button type="button" className="close" data-dismiss="modal">
+                  <button
+                    type="button"
+                    className="close"
+                    data-dismiss="modal"
+                    onClick={() => {
+                      this.handleReset();
+                      if (this.props.editSinhVien) {
+                        this.setState({
+                          values: this.props.editSinhVien,
+                        });
+                      }
+                    }}
+                  >
                     ×
                   </button>
                 </div>
@@ -72,13 +172,15 @@ export class ModalSV extends Component {
                       type="text"
                       name="id"
                       id="id"
+                      pattern="^(0|[1-9][0-9]*)$"
                       disabled={this.props.editSinhVien ? true : false}
-                      value={this.state.sinhVien.id}
+                      value={this.state.values.id}
                       onChange={this.handleInput}
                       className="form-control"
                       placeholder="Enter ID"
                       aria-describedby="helpId"
                     />
+                    <div className="text-danger">{this.state.errors.id}</div>
                   </div>
                   <div className="form-group">
                     <label htmlFor="name">Name</label>
@@ -87,26 +189,30 @@ export class ModalSV extends Component {
                       type="text"
                       name="name"
                       id="name"
+                      pattern="[0-9]"
                       className="form-control"
                       placeholder="Enter name"
                       aria-describedby="helpId"
                       onChange={this.handleInput}
-                      value={this.state.sinhVien.name}
+                      value={this.state.values.name}
                     />
+                    <div className="text-danger">{this.state.errors.name}</div>
                   </div>
                   <div className="form-group">
                     <label htmlFor="name">Email</label>
 
                     <Input
-                      type="text"
+                      type="email"
                       name="email"
                       id="email"
+                      pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                       className="form-control"
                       placeholder="Enter email"
                       aria-describedby="helpId"
                       onChange={this.handleInput}
-                      value={this.state.sinhVien.email}
+                      value={this.state.values.email}
                     />
+                    <div className="text-danger">{this.state.errors.email}</div>
                   </div>
                   <div className="form-group">
                     <label htmlFor="phone">Phone Number</label>
@@ -115,12 +221,14 @@ export class ModalSV extends Component {
                       type="text"
                       name="phone"
                       id="phone"
+                      pattern="^(0|[1-9][0-9]*)$"
                       className="form-control"
                       placeholder="Enter phone number"
                       aria-describedby="helpId"
                       onChange={this.handleInput}
-                      value={this.state.sinhVien.phone}
+                      value={this.state.values.phone}
                     />
+                    <div className="text-danger">{this.state.errors.phone}</div>
                   </div>
                 </div>
                 {/* Modal footer */}
@@ -130,7 +238,11 @@ export class ModalSV extends Component {
                       type="primary"
                       className="btn btn-danger"
                       data-dismiss="modal"
-                      onClick={() => this.props.suaSv(this.state.sinhVien)}
+                      onClick={() => {
+                        if (this.state.valid) {
+                          this.props.suaSv(this.state.values);
+                        }
+                      }}
                     >
                       Lưu
                     </Button>
@@ -139,7 +251,13 @@ export class ModalSV extends Component {
                       type="primary"
                       className="btn btn-danger"
                       data-dismiss="modal"
-                      onClick={() => this.props.submitForm(this.state.sinhVien)}
+                      onClick={() => {
+                        if (this.state.valid) {
+                          this.props.submitForm(this.state.values);
+                        } else {
+                          alert("Thêm thất bại !");
+                        }
+                      }}
                     >
                       Thêm
                     </Button>
